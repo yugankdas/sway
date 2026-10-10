@@ -242,28 +242,41 @@ function attachWss(server) {
 
 // ─── Servers ─────────────────────────────────────────────────────────────────
 
-// HTTPS (main)
-const tlsOptions = {
-  cert: fs.readFileSync(CERT),
-  key:  fs.readFileSync(KEY),
-};
-const httpsServer = https.createServer(tlsOptions, handleRequest);
-attachWss(httpsServer);
-httpsServer.listen(HTTPS_PORT, () => {
-  console.log(`\n  Sway is running:`);
-  console.log(`  ┌──────────────────────────────────────────┐`);
-  console.log(`  │  Booth      https://localhost:${HTTPS_PORT}     │`);
-  console.log(`  │  Controller https://localhost:${HTTPS_PORT}/controller │`);
-  console.log(`  └──────────────────────────────────────────┘`);
-  console.log(`\n  Accept the self-signed cert warning in your browser.\n`);
-});
+const hasCerts = fs.existsSync(CERT) && fs.existsSync(KEY);
 
-// HTTP → HTTPS redirect
-const httpServer = http.createServer((req, res) => {
-  const host = (req.headers.host ?? `localhost:${HTTPS_PORT}`).replace(/:\d+$/, '');
-  res.writeHead(301, { Location: `https://${host}:${HTTPS_PORT}${req.url}` });
-  res.end();
-});
-httpServer.listen(HTTP_PORT, () => {
-  console.log(`  HTTP  :${HTTP_PORT}  → redirecting to HTTPS :${HTTPS_PORT}`);
-});
+if (hasCerts) {
+  // Local Development: Use HTTPS with self-signed certs (needed for mobile sensors)
+  const tlsOptions = {
+    cert: fs.readFileSync(CERT),
+    key:  fs.readFileSync(KEY),
+  };
+  const httpsServer = https.createServer(tlsOptions, handleRequest);
+  attachWss(httpsServer);
+  httpsServer.listen(HTTPS_PORT, () => {
+    console.log(`\n  Sway is running:`);
+    console.log(`  ┌──────────────────────────────────────────┐`);
+    console.log(`  │  Booth      https://localhost:${HTTPS_PORT}     │`);
+    console.log(`  │  Controller https://localhost:${HTTPS_PORT}/controller │`);
+    console.log(`  └──────────────────────────────────────────┘`);
+    console.log(`\n  Accept the self-signed cert warning in your browser.\n`);
+  });
+
+  // HTTP → HTTPS redirect
+  const httpServer = http.createServer((req, res) => {
+    const host = (req.headers.host ?? `localhost:${HTTPS_PORT}`).replace(/:\d+$/, '');
+    res.writeHead(301, { Location: `https://${host}:${HTTPS_PORT}${req.url}` });
+    res.end();
+  });
+  httpServer.listen(HTTP_PORT, () => {
+    console.log(`  HTTP  :${HTTP_PORT}  → redirecting to HTTPS :${HTTPS_PORT}`);
+  });
+} else {
+  // Production (e.g. Render): Use plain HTTP.
+  // The platform handles SSL termination so the app gets a secure context automatically.
+  const port = process.env.PORT || 3000;
+  const server = http.createServer(handleRequest);
+  attachWss(server);
+  server.listen(port, () => {
+    console.log(`\n  Sway is running in production on port ${port}\n`);
+  });
+}
