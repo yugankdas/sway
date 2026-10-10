@@ -1,0 +1,13 @@
+[build]
+  publish = "public"
+  command = ""
+
+[[redirects]]
+  from = "/app"
+  to = "/app.html"
+  status = 200
+
+[[redirects]]
+  from = "/controller/*"
+  to = "/controller.html"
+  status = 200
