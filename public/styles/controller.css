@@ -1,0 +1,380 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SWAY · Phone controller (/controller)
+   A motion instrument: one dominant pad, compact readouts, thumb-zone actions.
+   Portrait-first, dynamic-viewport + safe-area aware. Depends on sway.css.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+html { height: 100%; }
+
+.ctrl-body {
+  --sa-t: env(safe-area-inset-top, 0px);
+  --sa-b: env(safe-area-inset-bottom, 0px);
+  --sa-l: env(safe-area-inset-left, 0px);
+  --sa-r: env(safe-area-inset-right, 0px);
+  --gutter: clamp(10px, 3.6vw, 18px);
+  --gap: clamp(8px, 1.6vh, 14px);
+
+  min-height: 100vh;
+  min-height: 100svh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding:
+    calc(var(--sa-t) + 8px)
+    calc(var(--sa-r) + var(--gutter))
+    calc(var(--sa-b) + var(--gap))
+    calc(var(--sa-l) + var(--gutter));
+  gap: var(--gap);
+  background: var(--paper);
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* ─── Header ─────────────────────────────────────────────────────────────────────── */
+.ctrl-header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+.ctrl-logo { font-size: 30px; margin-right: auto; }
+.ctrl-status { min-height: 34px; font-size: 11px; }
+.info-btn {
+  display: grid; place-items: center;
+  width: 44px; height: 44px;
+  flex: none;
+  border: var(--line-thin) solid var(--ink);
+  border-radius: 50%;
+  background: var(--white);
+}
+.info-btn[aria-expanded="true"] { background: var(--ink); color: var(--paper); }
+
+/* ─── Main column ───────────────────────────────────────────────────────────────────── */
+.ctrl-main {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+/* ─── Motion pad (the instrument) ───────────────────────────────────────────────────── */
+.pad {
+  --x: 50%;
+  --y: 50%;
+  --tilt: 0deg;
+  --squash: 1;
+  --stretch: 1;
+  --mag: 0;
+  --ang: 0rad;
+  --puck: clamp(64px, 19vmin, 104px);
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 180px;
+  border: var(--line-thick) solid var(--ink);
+  border-radius: var(--r-2);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  isolation: isolate;
+  /* split: Deck A blue on the left, Deck B yellow on the right */
+  background:
+    linear-gradient(90deg, var(--blue-tint) 0 50%, var(--yellow-tint) 50% 100%);
+}
+.pad-field { position: absolute; inset: 0; }
+
+/* Halftone that intensifies on the side you lean toward */
+.pad-field::before,
+.pad-field::after {
+  content: '';
+  position: absolute; top: 0; bottom: 0; width: 50%;
+  background-image: var(--halftone-ink);
+  background-size: 10px 10px;
+  opacity: .07;
+  transition: opacity var(--t-med);
+  z-index: 0;
+}
+.pad-field::before { left: 0;  -webkit-mask-image: linear-gradient(90deg, #000, transparent); mask-image: linear-gradient(90deg, #000, transparent); }
+.pad-field::after  { right: 0; -webkit-mask-image: linear-gradient(270deg, #000, transparent); mask-image: linear-gradient(270deg, #000, transparent); }
+.pad[data-side="a"] .pad-field::before { opacity: calc(.07 + var(--mag) * .35); }
+.pad[data-side="b"] .pad-field::after  { opacity: calc(.07 + var(--mag) * .35); }
+
+/* Deck letters: giant, at the edges */
+.pad-side {
+  position: absolute; top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-display);
+  font-size: clamp(64px, 22vmin, 128px);
+  line-height: 1;
+  -webkit-text-stroke: 2.5px var(--ink);
+  paint-order: stroke fill;
+  text-shadow: 4px 4px 0 var(--ink);
+  opacity: .35;
+  transition: opacity var(--t-med), transform var(--t-med) var(--ease-pop);
+  z-index: 1;
+}
+.pad-side--a { left: 10px;  color: var(--blue); }
+.pad-side--b { right: 10px; color: var(--yellow); }
+.pad[data-side="a"] .pad-side--a,
+.pad[data-side="b"] .pad-side--b { opacity: 1; transform: translateY(-50%) scale(1.08) rotate(-4deg); }
+
+.pad-edge {
+  position: absolute; left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 10px;
+  background: var(--white);
+  border: var(--line-thin) solid var(--ink);
+  font-family: var(--font-label);
+  font-size: 11px;
+  line-height: 1.4;
+  z-index: 2;
+  transition: background-color var(--t-med), color var(--t-med);
+}
+.pad-edge--top    { top: 8px; }
+.pad-edge--bottom { bottom: 8px; }
+.pad[data-energy="lift"]   .pad-edge--top    { background: var(--red); color: var(--white); }
+.pad[data-energy="muffle"] .pad-edge--bottom { background: var(--ink); color: var(--paper); }
+
+.pad-axis { position: absolute; background: var(--ink); z-index: 1; }
+.pad-axis--x { left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; opacity: .25; }
+.pad-axis--y { top: 0; bottom: 0; left: 50%; width: 3px; margin-left: -1.5px; }
+
+/* Dead zone ring at centre */
+.pad-dead {
+  position: absolute; left: 50%; top: 50%;
+  width: calc(var(--puck) * 1.25); height: calc(var(--puck) * 1.25);
+  transform: translate(-50%, -50%);
+  border: var(--line-thin) dashed var(--ink);
+  border-radius: 50%;
+  opacity: .4;
+  z-index: 1;
+}
+
+/* Speed lines: radiate behind the puck only when movement is big */
+.pad-lines {
+  position: absolute;
+  left: var(--x); top: var(--y);
+  width: calc(var(--puck) * 3.2); height: calc(var(--puck) * 3.2);
+  transform: translate(-50%, -50%);
+  background: repeating-conic-gradient(from 0deg, var(--ink) 0deg 2.2deg, transparent 2.2deg 15deg);
+  -webkit-mask-image: radial-gradient(circle, transparent 32%, #000 34%, transparent 70%);
+  mask-image: radial-gradient(circle, transparent 32%, #000 34%, transparent 70%);
+  opacity: 0;
+  transition: opacity var(--t-med);
+  z-index: 2;
+  pointer-events: none;
+}
+.pad.is-moving .pad-lines { opacity: calc((var(--mag) - .3) * 0.9); }
+
+/* The puck: a little phone that leans with you */
+.puck {
+  position: absolute;
+  left: var(--x); top: var(--y);
+  width: var(--puck); height: calc(var(--puck) * 1.45);
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  will-change: left, top;
+}
+.puck-body {
+  position: absolute; inset: 0;
+  background: var(--red);
+  border: var(--line-thick) solid var(--ink);
+  border-radius: 14px;
+  box-shadow: 5px 5px 0 var(--ink);
+  transform: rotate(var(--tilt)) scale(var(--squash), var(--stretch));
+  transition: background-color var(--t-med);
+}
+.puck-screen {
+  position: absolute; inset: 9% 13% 20%;
+  background: var(--white);
+  border: var(--line-thin) solid var(--ink);
+  border-radius: 5px;
+}
+.puck-screen::after {
+  content: '';
+  position: absolute; left: 50%; bottom: -28%;
+  width: 22%; height: 9%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  border-radius: 4px;
+}
+.pad[data-side="preview"] .puck-body { background: var(--white); }
+.pad[data-side="preview"] .puck { opacity: .55; }
+
+/* Pre-ready callout (connection/permission/calibration instructions) */
+.pad-callout {
+  position: absolute;
+  left: 12px; right: 12px; bottom: 40px;
+  display: grid; gap: 2px;
+  padding: 10px 14px 12px;
+  background: var(--yellow);
+  border: var(--line) solid var(--ink);
+  box-shadow: var(--shadow-sm);
+  z-index: 4;
+  transition: opacity var(--t-med), transform var(--t-med) var(--ease-out);
+}
+.pad-callout-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: .02em;
+}
+.pad-callout-text { font-weight: 700; font-size: 15px; line-height: 1.3; }
+.ctrl-body[data-phase="ready"] .pad-callout,
+.ctrl-body[data-phase="calibrating"] .pad-callout {
+  opacity: 0; transform: translateY(12px); pointer-events: none;
+}
+.ctrl-body[data-phase="lost"] .pad-callout,
+.ctrl-body[data-phase="blocked"] .pad-callout { background: var(--red); color: var(--white); }
+.ctrl-body[data-phase="lost"] .pad { filter: grayscale(.85); }
+
+.pad-burst {
+  left: 50%; top: 50%;
+  width: 190px; height: 190px;
+  margin: -95px 0 0 -95px;
+  z-index: 5;
+}
+.pad-burst .burst-text { font-size: 40px; color: var(--red); }
+
+/* ─── Readouts ──────────────────────────────────────────────────────────────────── */
+.readouts {
+  flex: none;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+.readout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 12px;
+  background: var(--white);
+  border: var(--line) solid var(--ink);
+  border-radius: var(--r-1);
+  min-width: 0;
+}
+.readout-label { font-family: var(--font-label); font-size: 12px; flex: none; }
+.readout-value {
+  font-weight: 700; font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.readout--mix .readout-value { min-width: 8.5ch; text-align: right; }
+.readout--energy .readout-value { min-width: 8.5ch; }
+.mixbar {
+  position: relative;
+  flex: 1;
+  height: 16px;
+  min-width: 50px;
+  display: flex;
+  border: var(--line-thin) solid var(--ink);
+  background: var(--paper);
+}
+.mixbar-a, .mixbar-b { flex: 1; height: 100%; }
+.mixbar-a { background: var(--blue);   transform-origin: left;  border-right: 1px solid var(--ink); }
+.mixbar-b { background: var(--yellow); transform-origin: right; border-left: 1px solid var(--ink); }
+.mixbar-needle {
+  position: absolute; top: -5px; bottom: -5px; left: 50%;
+  width: 4px; margin-left: -2px;
+  background: var(--red);
+  box-shadow: 0 0 0 1.5px var(--ink);
+}
+
+/* ─── Calibrate (thumb zone) ────────────────────────────────────────────────────────── */
+.calibrate-btn {
+  flex: none;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  width: 100%;
+  min-height: 64px;
+  padding: 8px 16px;
+  background: var(--red);
+  color: var(--white);
+  border: var(--line-thick) solid var(--ink);
+  border-radius: var(--r-2);
+  box-shadow: var(--shadow);
+  transition: transform var(--t-fast) var(--ease-out), box-shadow var(--t-fast), background-color var(--t-med);
+}
+.calibrate-btn:active { transform: translate(4px, 4px); box-shadow: 1px 1px 0 var(--ink); }
+.calibrate-label {
+  font-family: var(--font-display);
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: .03em;
+  -webkit-text-stroke: 1.2px var(--ink);
+  paint-order: stroke fill;
+  text-shadow: 2px 2px 0 var(--ink);
+}
+.calibrate-sub { font-weight: 700; font-size: 13px; line-height: 1.2; }
+.calibrate-btn[data-state="done"] { background: var(--white); color: var(--ink); min-height: 56px; }
+.calibrate-btn[data-state="done"] .calibrate-label { font-size: 26px; color: var(--ink); -webkit-text-stroke: 0; text-shadow: none; }
+.calibrate-btn[data-state="busy"] { background: var(--yellow); color: var(--ink); }
+.calibrate-btn[data-state="error"] { background: var(--ink); color: var(--paper); }
+.calibrate-btn:focus-visible { outline-offset: 4px; }
+
+/* ─── Sensor readout sheet ──────────────────────────────────────────────────────────── */
+.sheet {
+  position: fixed;
+  left: calc(var(--sa-l) + var(--gutter));
+  right: calc(var(--sa-r) + var(--gutter));
+  top: calc(var(--sa-t) + 60px);
+  padding: 10px 12px;
+  background: var(--ink);
+  color: var(--paper);
+  border: var(--line) solid var(--ink);
+  box-shadow: var(--shadow-sm);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  z-index: 20;
+  pointer-events: none;
+}
+.sheet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+.sheet-grid dt { color: var(--yellow); font-size: 11px; }
+.sheet-msg { margin-top: 6px; color: var(--yellow); }
+
+/* ─── Short screens (e.g. 360×640 with browser chrome ≈ 360×560) ──────────── */
+@media (max-height: 700px) {
+  .ctrl-logo { font-size: 26px; }
+  .ctrl-header { min-height: 40px; }
+  .calibrate-btn { min-height: 56px; padding: 6px 12px; }
+  .calibrate-label { font-size: 26px; }
+  .calibrate-sub { font-size: 12px; }
+  .pad-callout-title { font-size: 24px; }
+  .pad-callout-text { font-size: 14px; }
+}
+@media (max-height: 580px) {
+  .calibrate-sub { display: none; }
+  .calibrate-btn { min-height: 50px; }
+  .readout { min-height: 40px; }
+  .pad-edge { font-size: 10px; }
+  .pad-callout { bottom: 30px; padding: 8px 10px; }
+}
+
+/* ─── Landscape phones: instrument left, controls right ─────────────────────────────── */
+@media (orientation: landscape) and (max-height: 500px) {
+  .ctrl-main {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    grid-template-rows: auto auto 1fr;
+  }
+  .pad { grid-row: 1 / -1; min-height: 0; }
+  .readouts { grid-template-columns: 1fr; }
+  .calibrate-btn { align-self: end; }
+}
+
+/* ─── Narrow phones (≤400px): stack the energy readout so Mix gets the width ── */
+@media (max-width: 400px) {
+  .readouts { gap: 6px; }
+  .readout { padding: 4px 10px; gap: 6px; }
+  .readout--energy { flex-direction: column; align-items: flex-start; justify-content: center; gap: 0; }
+  .readout--energy .readout-label { font-size: 10px; line-height: 1.2; }
+  .readout--energy .readout-value { min-width: 7.5ch; line-height: 1.2; }
+  .readout--mix .readout-value { min-width: 0; font-size: 14px; }
+  .mixbar { min-width: 32px; }
+}

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sway · DJ Booth</title>
+  <meta name="description" content="Sway DJ booth — load two tracks, pair your phone, and mix with motion." />
+  <meta name="theme-color" content="#F8E9C9" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preload" href="/fonts/bowlby-one-sc.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/comic-neue-700.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/bangers.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/styles/sway.css" />
+  <link rel="stylesheet" href="/styles/booth.css" />
+</head>
+<body class="booth-body">
+
+  <!-- Icon sprite -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="5.5" y="4.5" width="4.5" height="15" rx="1" fill="currentColor" stroke="none"/><rect x="14" y="4.5" width="4.5" height="15" rx="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-load" viewBox="0 0 24 24"><path d="M12 15V3.5M7 8l5-5 5 5"/><path d="M4 14v5.5h16V14"/></symbol>
+    <symbol id="i-scope" viewBox="0 0 24 24"><path d="M3 12h3l2.5-6 4 12 3-9 2 3H21"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M10.5 18.5h3"/></symbol>
+    <symbol id="i-vol" viewBox="0 0 24 24"><path d="M4 9.5h4l5-4v13l-5-4H4z"/><path d="M16.5 9a4 4 0 0 1 0 6"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#crossfader-track">Skip to crossfader</a>
+
+  <!-- ─── Header ─────────────────────────────────────────────────────────── -->
+  <header class="booth-header">
+    <div class="bh-brand">
+      <a class="wordmark" href="/" aria-label="Sway home">SWAY!</a>
+      <span class="caption">DJ booth</span>
+    </div>
+
+    <div class="mode-switch" role="group" aria-label="Mixing mode">
+      <button id="mode-manual" class="mode-btn mode-btn--active" aria-pressed="true">
+        <span class="mode-btn-name">Manual</span>
+        <span class="mode-btn-hint">You ride the fader</span>
+      </button>
+      <button id="mode-auto" class="mode-btn" aria-pressed="false">
+        <span class="mode-btn-name">Auto DJ</span>
+        <span class="mode-btn-hint">You call it, Sway times it</span>
+      </button>
+    </div>
+
+    <div class="bh-status">
+      <span id="ws-status" class="pill" data-state="busy" title="Laptop ↔ server connection">
+        <span class="pill-dot" aria-hidden="true"></span><span class="ws-label">Server…</span>
+      </span>
+      <span id="phone-status-badge" class="pill" data-state="" title="Phone controller">
+        <span class="pill-dot" aria-hidden="true"></span><span class="pill-text">No phone</span>
+      </span>
+      <button id="debug-toggle-btn" class="btn btn--sm btn--paper" aria-expanded="false" aria-controls="debug-panel">
+        <svg class="icon icon--sm"><use href="#i-scope"/></svg>Diagnostics
+      </button>
+    </div>
+
+    <!-- Toast (overlays, never shifts layout) -->
+    <div id="connection-banner" class="toast" role="status" aria-live="polite" hidden>
+      <span id="connection-banner-text"></span>
+    </div>
+  </header>
+
+  <!-- ─── Booth ──────────────────────────────────────────────────────────── -->
+  <main class="booth layout" id="booth">
+
+    <!-- Deck A -->
+    <section class="deck deck--a" id="deck-a" data-active="false" data-state="empty" aria-labelledby="deck-a-title">
+      <header class="deck-head">
+        <h2 class="deck-badge" id="deck-a-title"><span class="deck-badge-word">Deck</span> A</h2>
+        <div class="deck-meta">
+          <span id="deck-a-analysis-badge" class="tag analysis-badge" data-status="none">No track</span>
+          <span class="deck-onair" aria-hidden="true">On air</span>
+        </div>
+      </header>
+
+      <div class="deck-title-row">
+        <p class="deck-track-name" id="deck-a-track" title="">Load an MP3 to start</p>
+        <p class="deck-bpm"><span id="deck-a-bpm" class="deck-bpm-num">—</span><span class="deck-bpm-unit">BPM</span></p>
+      </div>
+
+      <div class="wave" id="deck-a-wave">
+        <canvas class="wave-canvas" id="deck-a-wave-canvas" aria-hidden="true"></canvas>
+        <div class="deck-progress-bar" id="deck-a-progress-bar" aria-hidden="true">
+          <div class="deck-progress-fill" id="deck-a-progress-fill"></div>
+          <div class="deck-progress-head" id="deck-a-progress-head"></div>
+        </div>
+        <p class="wave-empty">Drop in a track — the waveform shows up here.</p>
+      </div>
+
+      <div class="deck-time-row">
+        <span id="deck-a-time" class="deck-time">0:00</span>
+        <span class="deck-level" aria-hidden="true"><span class="deck-level-fill" id="deck-a-level"></span></span>
+        <span id="deck-a-duration" class="deck-duration">0:00</span>
+      </div>
+
+      <div class="deck-controls">
+        <button id="deck-a-play" class="btn btn--blue btn-play" disabled aria-label="Play deck A">
+          <svg class="icon icon--lg play-icon"><use href="#i-play"/></svg>
+          <span class="btn-play-label">Play</span>
+        </button>
+        <label class="btn btn--paper file-upload-label" id="deck-a-upload-label">
+          <svg class="icon"><use href="#i-load"/></svg>
+          <span class="file-upload-text">Load MP3</span>
+          <input type="file" id="deck-a-file" accept="audio/*,.mp3" class="file-input" />
+        </label>
+        <label class="deck-vol" title="Deck A volume">
+          <svg class="icon icon--sm" aria-hidden="true"><use href="#i-vol"/></svg>
+          <span class="sr-only">Deck A volume</span>
+          <input type="range" id="deck-a-vol" min="0" max="1" step="0.01" value="1" class="ink-range vol-slider" />
+        </label>
+      </div>
+    </section>
+
+    <!-- Centre column -->
+    <section class="centre" aria-label="Mix status and phone">
+
+      <div class="announcer" id="transition-status" data-mode="MANUAL" data-state="manual" aria-live="polite">
+        <div class="announcer-top">
+          <span class="caption announcer-mode" id="announcer-mode">Manual</span>
+          <span class="announcer-sync" id="announcer-sync">Direct crossfade</span>
+        </div>
+        <p class="ts-label" id="ts-label">Ride it!</p>
+        <p class="ts-message" id="ts-message">Tilt the phone or drag the fader.</p>
+        <ol class="ts-steps" id="ts-steps" aria-label="Transition checks">
+          <li id="step-beat"   class="ts-step">Beat</li>
+          <li id="step-phrase" class="ts-step">Phrase</li>
+          <li id="step-bpm"    class="ts-step">BPM</li>
+        </ol>
+        <div id="active-deck-indicator" class="active-deck-indicator">
+          <span id="active-deck-text">Nothing on air</span>
+        </div>
+      </div>
+
+      <div class="pair" id="connect-panel" data-phone="waiting">
+        <div class="pair-qr" id="qr-wrap">
+          <div class="qr-loading" id="qr-loading">Drawing QR…</div>
+          <img id="qr-img" class="qr-img" alt="QR code that opens the Sway phone controller" hidden />
+        </div>
+        <div class="pair-copy">
+          <h2 class="pair-title" id="pair-title">Pair your phone</h2>
+          <p class="pair-text" id="pair-text">Scan the code, open the page, then tap <b>Calibrate</b> while holding the phone naturally.</p>
+          <p class="connect-url" id="connect-url"></p>
+          <p class="room-code" id="room-code-display" title="Your unique booth code — share this or the QR"></p>
+          <dl class="pair-stats">
+            <div><dt>Phone</dt><dd><span id="phone-state-text">Waiting</span></dd></div>
+            <div><dt>Neutral</dt><dd><span id="calibration-badge" class="badge">Not calibrated</span></dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- Deck B -->
+    <section class="deck deck--b" id="deck-b" data-active="false" data-state="empty" aria-labelledby="deck-b-title">
+      <header class="deck-head">
+        <h2 class="deck-badge" id="deck-b-title"><span class="deck-badge-word">Deck</span> B</h2>
+        <div class="deck-meta">
+          <span id="deck-b-analysis-badge" class="tag analysis-badge" data-status="none">No track</span>
+          <span class="deck-onair" aria-hidden="true">On air</span>
+        </div>
+      </header>
+
+      <div class="deck-title-row">
+        <p class="deck-track-name" id="deck-b-track" title="">Load an MP3 to start</p>
+        <p class="deck-bpm"><span id="deck-b-bpm" class="deck-bpm-num">—</span><span class="deck-bpm-unit">BPM</span></p>
+      </div>
+
+      <div class="wave" id="deck-b-wave">
+        <canvas class="wave-canvas" id="deck-b-wave-canvas" aria-hidden="true"></canvas>
+        <div class="deck-progress-bar" id="deck-b-progress-bar" aria-hidden="true">
+          <div class="deck-progress-fill" id="deck-b-progress-fill"></div>
+          <div class="deck-progress-head" id="deck-b-progress-head"></div>
+        </div>
+        <p class="wave-empty">Drop in a track — the waveform shows up here.</p>
+      </div>
+
+      <div class="deck-time-row">
+        <span id="deck-b-time" class="deck-time">0:00</span>
+        <span class="deck-level" aria-hidden="true"><span class="deck-level-fill" id="deck-b-level"></span></span>
+        <span id="deck-b-duration" class="deck-duration">0:00</span>
+      </div>
+
+      <div class="deck-controls">
+        <button id="deck-b-play" class="btn btn--yellow btn-play" disabled aria-label="Play deck B">
+          <svg class="icon icon--lg play-icon"><use href="#i-play"/></svg>
+          <span class="btn-play-label">Play</span>
+        </button>
+        <label class="btn btn--paper file-upload-label" id="deck-b-upload-label">
+          <svg class="icon"><use href="#i-load"/></svg>
+          <span class="file-upload-text">Load MP3</span>
+          <input type="file" id="deck-b-file" accept="audio/*,.mp3" class="file-input" />
+        </label>
+        <label class="deck-vol" title="Deck B volume">
+          <svg class="icon icon--sm" aria-hidden="true"><use href="#i-vol"/></svg>
+          <span class="sr-only">Deck B volume</span>
+          <input type="range" id="deck-b-vol" min="0" max="1" step="0.01" value="1" class="ink-range vol-slider" />
+        </label>
+      </div>
+    </section>
+
+    <!-- Console: crossfader + energy -->
+    <section class="console" aria-label="Mixer">
+      <div class="xf">
+        <div class="xf-head">
+          <h2 class="console-label">Mix</h2>
+          <p class="console-hint" id="xf-hint">Tilt left / right · drag · arrow keys</p>
+          <output class="xf-readout" id="control-value-display" aria-live="off">50 / 50</output>
+        </div>
+        <div class="xf-row">
+          <span class="xf-end xf-end--a" aria-hidden="true">A</span>
+          <div class="crossfader-track" id="crossfader-track" tabindex="0" role="slider"
+               aria-label="Crossfader, Deck A to Deck B" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-valuetext="Centre">
+            <div class="cf-fill-left"  id="cf-fill-left"></div>
+            <div class="cf-fill-right" id="cf-fill-right"></div>
+            <div class="cf-ticks" aria-hidden="true"></div>
+            <div class="cf-center-tick" aria-hidden="true"></div>
+            <div class="cf-intent" id="cf-intent" aria-hidden="true" title="Phone intent"></div>
+            <div class="cf-handle" id="cf-handle"><div class="cf-handle-inner"></div></div>
+            <div class="burst burst--xf" id="xf-burst" aria-hidden="true">
+              <svg viewBox="0 0 120 120"><polygon points="116,60 93,69 108,88 84,84 88,108 69,93 60,116 51,93 32,108 36,84 12,88 27,69 4,60 27,51 12,32 36,36 32,12 51,27 60,4 69,27 88,12 84,36 108,32 93,51" fill="#E7473F" stroke="#242321" stroke-width="4" stroke-linejoin="round"/></svg>
+              <span class="burst-text" id="xf-burst-text">Swap!</span>
+            </div>
+          </div>
+          <span class="xf-end xf-end--b" aria-hidden="true">B</span>
+        </div>
+      </div>
+
+      <div class="fx">
+        <div class="fx-block">
+          <div class="fx-head">
+            <h2 class="console-label console-label--sm">Energy</h2>
+            <output class="fx-readout" id="energy-value-display">Open</output>
+          </div>
+          <div class="crossfader-track energy-track" id="energy-track" tabindex="0" role="slider"
+               aria-label="Energy filter, muffle to lift" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-valuetext="Open">
+            <div class="cf-fill-left  ef-fill-left"  id="energy-fill-left"></div>
+            <div class="cf-fill-right ef-fill-right" id="energy-fill-right"></div>
+            <div class="cf-center-tick" aria-hidden="true"></div>
+            <div class="cf-handle energy-handle" id="energy-handle"><div class="cf-handle-inner"></div></div>
+          </div>
+          <div class="fx-ends"><span title="Low-pass filter">Muffle</span><span>Tilt fwd / back</span><span title="High-pass filter">Lift</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ─── Diagnostics drawer ─────────────────────────────────────────────── -->
+  <aside class="drawer" id="debug-panel" aria-hidden="true" aria-labelledby="debug-title" inert>
+    <header class="drawer-head">
+      <h2 class="drawer-title" id="debug-title">Diagnostics</h2>
+      <button id="debug-close-btn" class="btn btn--sm btn--paper" aria-label="Close diagnostics">
+        <svg class="icon icon--sm"><use href="#i-close"/></svg>
+      </button>
+    </header>
+
+    <dl class="debug-grid">
+      <div class="debug-stat"><dt>Latency</dt><dd><span id="debug-latency">—</span> ms</dd></div>
+      <div class="debug-stat"><dt>Msg rate</dt><dd><span id="debug-hz">—</span> Hz</dd></div>
+      <div class="debug-stat"><dt>Raw γ (mix)</dt><dd><span id="debug-tiltx">—</span>°</dd></div>
+      <div class="debug-stat"><dt>Raw β (energy)</dt><dd><span id="debug-tilty">—</span>°</dd></div>
+      <div class="debug-stat"><dt>Phone mix</dt><dd id="debug-norm">—</dd></div>
+      <div class="debug-stat"><dt>Messages</dt><dd id="debug-msgs">0</dd></div>
+      <div class="debug-stat"><dt>Audio fader</dt><dd id="debug-xfade">—</dd></div>
+      <div class="debug-stat"><dt>Engine state</dt><dd id="debug-engine">—</dd></div>
+      <div class="debug-stat"><dt>A analysis</dt><dd id="debug-analysis-a">—</dd></div>
+      <div class="debug-stat"><dt>B analysis</dt><dd id="debug-analysis-b">—</dd></div>
+      <div class="debug-stat"><dt>Audio context</dt><dd id="debug-ctx">—</dd></div>
+      <div class="debug-stat"><dt>Playback rate</dt><dd id="debug-rate">—</dd></div>
+    </dl>
+
+    <div class="analysis-section">
+      <div class="analysis-deck">
+        <p class="analysis-header">Deck A analysis <span class="analysis-bpm" id="analysis-a-bpm"></span></p>
+        <canvas class="analysis-canvas" id="canvas-a" width="500" height="48"></canvas>
+      </div>
+      <div class="analysis-deck">
+        <p class="analysis-header">Deck B analysis <span class="analysis-bpm" id="analysis-b-bpm"></span></p>
+        <canvas class="analysis-canvas" id="canvas-b" width="500" height="48"></canvas>
+      </div>
+      <p class="analysis-legend"><i class="lg lg--sec"></i>Sections <i class="lg lg--beat"></i>Downbeats <i class="lg lg--tp"></i>Transition points</p>
+    </div>
+
+    <div class="log-section">
+      <div class="log-header">
+        <h3 class="log-title">Event log</h3>
+        <button id="log-clear-btn" class="btn btn--sm btn--paper">Clear</button>
+      </div>
+      <div id="event-log" class="event-log" role="log" aria-live="off"></div>
+    </div>
+  </aside>
+
+  <script src="/scripts/dashboard.js" type="module"></script>
+</body>
+</html>

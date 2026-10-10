@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="theme-color" content="#F8E9C9" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <title>Sway · Controller</title>
+  <meta name="description" content="Sway phone controller — tilt to mix and shape energy." />
+  <link rel="preload" href="/fonts/bowlby-one-sc.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/bangers.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/styles/sway.css" />
+  <link rel="stylesheet" href="/styles/controller.css" />
+</head>
+<body class="ctrl-body" data-phase="connecting">
+
+  <!-- ─── Header ────────────────────────────────────────────────────────── -->
+  <header class="ctrl-header">
+    <span class="wordmark ctrl-logo" aria-label="Sway">SWAY!</span>
+    <span id="ctrl-status" class="pill ctrl-status" data-state="busy" role="status" aria-live="polite">
+      <span class="pill-dot" aria-hidden="true"></span>
+      <span id="ctrl-status-label">Connecting…</span>
+    </span>
+    <button id="debug-toggle" class="info-btn" aria-expanded="false" aria-controls="sway-debug" aria-label="Show sensor readout">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3l2.5-6 4 12 3-9 2 3H21"/></svg>
+    </button>
+  </header>
+
+  <!-- ─── Instrument ────────────────────────────────────────────────────── -->
+  <main class="ctrl-main">
+
+    <section class="pad" id="pad" aria-label="Motion pad: left and right mixes between decks, forward and back shapes energy">
+      <div class="pad-field" aria-hidden="true">
+        <span class="pad-side pad-side--a">A</span>
+        <span class="pad-side pad-side--b">B</span>
+        <span class="pad-edge pad-edge--top">Lift</span>
+        <span class="pad-edge pad-edge--bottom">Muffle</span>
+        <span class="pad-axis pad-axis--x"></span>
+        <span class="pad-axis pad-axis--y"></span>
+        <span class="pad-dead"></span>
+        <span class="pad-lines" id="pad-lines"></span>
+        <span class="puck" id="puck"><span class="puck-body" id="puck-body"><span class="puck-screen"></span></span></span>
+      </div>
+
+      <!-- Overlay for steps before the instrument is live -->
+      <div class="pad-callout" id="pad-callout">
+        <p class="pad-callout-title" id="pad-callout-title">Hang tight</p>
+        <p class="pad-callout-text" id="calibrate-hint">Connecting to the booth…</p>
+      </div>
+
+      <div class="burst pad-burst" id="pad-burst" aria-hidden="true">
+        <svg viewBox="0 0 120 120"><polygon points="116,60 93,69 108,88 84,84 88,108 69,93 60,116 51,93 32,108 36,84 12,88 27,69 4,60 27,51 12,32 36,36 32,12 51,27 60,4 69,27 88,12 84,36 108,32 93,51" fill="#F5D84E" stroke="#242321" stroke-width="4" stroke-linejoin="round"/></svg>
+        <span class="burst-text">Locked!</span>
+      </div>
+    </section>
+
+    <!-- Readouts: mirror the values actually being sent -->
+    <div class="readouts" aria-live="off">
+      <div class="readout readout--mix" id="axis-mix">
+        <span class="readout-label">Mix</span>
+        <div class="mixbar" aria-hidden="true">
+          <span class="mixbar-a" id="mixbar-a"></span>
+          <span class="mixbar-b" id="mixbar-b"></span>
+          <span class="mixbar-needle" id="ctrl-meter-needle"></span>
+        </div>
+        <span class="readout-value" id="ctrl-value-display">—</span>
+      </div>
+      <div class="readout readout--energy" id="axis-energy">
+        <span class="readout-label">Energy</span>
+        <span class="readout-value" id="energy-display">—</span>
+      </div>
+    </div>
+
+    <!-- Calibrate: thumb zone, biggest target on screen -->
+    <button id="calibrate-btn" class="calibrate-btn" data-state="idle">
+      <span class="calibrate-label" id="calibrate-label">Calibrate</span>
+      <span class="calibrate-sub" id="calibrate-sub">Hold the phone naturally, then tap</span>
+    </button>
+
+    <!-- Kept for script compatibility; permission is requested via the calibrate button -->
+    <div id="sensor-permission" hidden></div>
+  </main>
+
+  <!-- Sensor readout sheet -->
+  <div id="sway-debug" class="sheet" hidden></div>
+
+  <script src="/scripts/controller.js" type="module"></script>
+</body>
+</html>

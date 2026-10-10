@@ -1,0 +1,14 @@
+{
+  "name": "sway",
+  "version": "1.0.0",
+  "description": "Sway – Two-device intuitive DJ system (Milestone 1: Motion → WebSocket → Crossfader)",
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0",
+    "qrcode": "^1.5.4"
+  }
+}

@@ -1,0 +1,42 @@
+# ─── Dependencies ────────────────────────────────────────────────────────────
+node_modules/
+
+# ─── TLS certificates (self-signed, generated locally — never commit keys) ───
+server/cert.pem
+server/key.pem
+
+# ─── Python virtualenv (audio analysis) ─────────────────────────────────────
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ─── Environment / secrets ───────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ─── OS noise ────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Editor metadata ─────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ─── Build artefacts ─────────────────────────────────────────────────────────
+dist/
+build/
+out/
+
+# ─── Logs ────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+
+# ─── Lock files (keep package-lock for reproducible installs) ────────────────
+# package-lock.json is committed intentionally

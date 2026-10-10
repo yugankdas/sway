@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sway! · The most intuitive way to DJ</title>
+  <meta name="description" content="Sway turns your phone into a DJ instrument. Tilt to mix two decks on your laptop. Sway handles the timing." />
+  <meta name="theme-color" content="#F8E9C9" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preload" href="/fonts/bangers.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/comic-neue-400.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/bowlby-one-sc.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/styles/sway.css" />
+  <link rel="stylesheet" href="/styles/landing.css" />
+</head>
+<body class="landing">
+
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ─── Nav ──────────────────────────────────────────────────────────────────── -->
+  <header class="nav">
+    <a class="wordmark nav-mark" href="/" aria-label="Sway home">SWAY!</a>
+    <nav class="nav-links" aria-label="Page sections">
+      <a href="#how">How it works</a>
+      <a href="#booth">The booth</a>
+      <a href="#modes">Manual vs Auto</a>
+    </nav>
+    <a class="btn btn--sm btn--ink nav-cta" href="/app">Open the booth</a>
+  </header>
+
+  <main id="main">
+
+    <!-- ─── Hero: comic cover ──────────────────────────────────────────────────────── -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-cover">
+        <div class="hero-masthead" aria-hidden="true">
+          <span>Issue #1</span><span>A two-device DJ system</span><span>Laptop + phone</span>
+        </div>
+
+        <div class="hero-copy">
+          <h1 class="hero-title" id="hero-title">
+            <span class="ht-line ht-1">Your hands.</span>
+            <span class="ht-line ht-2">Your music.</span>
+            <span class="ht-line ht-3">Your rules.</span>
+          </h1>
+          <p class="hero-sub">Move your phone. Shape the music. Sway handles the rest.</p>
+          <div class="hero-ctas">
+            <a class="btn btn--lg btn--red" href="/app">Try Sway</a>
+            <a class="btn btn--lg btn--paper" href="#how">See how it works</a>
+          </div>
+          <p class="hero-note">Runs in the browser. Bring your own MP3s.</p>
+        </div>
+
+        <figure class="hero-art" aria-hidden="true">
+          <svg viewBox="0 0 600 600" class="hero-svg" role="presentation">
+            <defs>
+              <pattern id="dots" width="10" height="10" patternUnits="userSpaceOnUse">
+                <circle cx="5" cy="5" r="2.1" fill="#242321"/>
+              </pattern>
+              <pattern id="dots-red" width="9" height="9" patternUnits="userSpaceOnUse">
+                <circle cx="4.5" cy="4.5" r="2" fill="#E7473F"/>
+              </pattern>
+              <clipPath id="burst-clip">
+                <polygon points="300,15 336,98 397,32 403,122 483,82 457,168 547,158 493,230 581,251 505,300 581,349 493,370 547,442 457,432 483,518 403,478 397,568 336,502 300,585 264,502 203,568 197,478 117,518 143,432 53,443 107,370 19,349 95,300 19,251 107,230 53,158 143,168 117,82 198,122 203,32 264,98"/>
+              </clipPath>
+            </defs>
+
+            <!-- Impact burst -->
+            <polygon points="300,15 336,98 397,32 403,122 483,82 457,168 547,158 493,230 581,251 505,300 581,349 493,370 547,442 457,432 483,518 403,478 397,568 336,502 300,585 264,502 203,568 197,478 117,518 143,432 53,443 107,370 19,349 95,300 19,251 107,230 53,158 143,168 117,82 198,122 203,32 264,98"
+                     fill="#F5D84E" stroke="#242321" stroke-width="6" stroke-linejoin="round" transform="translate(10 10)" opacity="1" class="burst-shadow"/>
+            <polygon points="300,15 336,98 397,32 403,122 483,82 457,168 547,158 493,230 581,251 505,300 581,349 493,370 547,442 457,432 483,518 403,478 397,568 336,502 300,585 264,502 203,568 197,478 117,518 143,432 53,443 107,370 19,349 95,300 19,251 107,230 53,158 143,168 117,82 198,122 203,32 264,98"
+                     fill="#F5D84E" stroke="#242321" stroke-width="6" stroke-linejoin="round"/>
+            <g clip-path="url(#burst-clip)">
+              <circle cx="420" cy="180" r="190" fill="url(#dots-red)" opacity=".55"/>
+            </g>
+
+            <!-- Deck A record -->
+            <g class="rec rec-a" transform="translate(118 452)">
+              <circle r="92" fill="#242321" transform="translate(7 7)"/>
+              <circle r="92" fill="#2457D6" stroke="#242321" stroke-width="6"/>
+              <circle r="70" fill="none" stroke="#242321" stroke-width="2" opacity=".55"/>
+              <circle r="54" fill="none" stroke="#242321" stroke-width="2" opacity=".55"/>
+              <circle r="30" fill="#F8E9C9" stroke="#242321" stroke-width="5"/>
+              <text y="13" text-anchor="middle" font-family="Bowlby One SC, Arial Black" font-size="34" fill="#242321">A</text>
+            </g>
+            <!-- Deck B record -->
+            <g class="rec rec-b" transform="translate(484 452)">
+              <circle r="92" fill="#242321" transform="translate(7 7)"/>
+              <circle r="92" fill="#F5D84E" stroke="#242321" stroke-width="6"/>
+              <circle r="92" fill="url(#dots)" opacity=".18"/>
+              <circle r="70" fill="none" stroke="#242321" stroke-width="2" opacity=".55"/>
+              <circle r="54" fill="none" stroke="#242321" stroke-width="2" opacity=".55"/>
+              <circle r="30" fill="#F8E9C9" stroke="#242321" stroke-width="5"/>
+              <text y="13" text-anchor="middle" font-family="Bowlby One SC, Arial Black" font-size="34" fill="#242321">B</text>
+            </g>
+
+            <!-- Motion arcs + arrows -->
+            <g fill="none" stroke="#242321" stroke-width="7" stroke-linecap="round">
+              <path d="M196 214 Q 150 290 190 360" />
+              <path d="M404 214 Q 450 290 410 360" />
+            </g>
+            <g fill="#242321">
+              <polygon points="174,352 205,376 206,338"/>
+              <polygon points="426,352 395,376 394,338"/>
+            </g>
+
+            <!-- Speed lines (motion toward B) -->
+            <g stroke="#242321" stroke-width="6" stroke-linecap="round" class="speed">
+              <line x1="170" y1="170" x2="222" y2="184"/>
+              <line x1="156" y1="204" x2="212" y2="216"/>
+              <line x1="176" y1="240" x2="214" y2="248"/>
+            </g>
+
+            <!-- Ghost phone (where it was) -->
+            <g transform="rotate(-4 300 290)" opacity=".9">
+              <rect x="238" y="150" width="124" height="232" rx="20" fill="none" stroke="#242321" stroke-width="4" stroke-dasharray="10 9"/>
+            </g>
+
+            <!-- Phone, tilted toward B -->
+            <g class="phone" transform="rotate(16 300 290)">
+              <rect x="246" y="158" width="124" height="232" rx="20" fill="#242321"/>
+              <rect x="238" y="150" width="124" height="232" rx="20" fill="#E7473F" stroke="#242321" stroke-width="6"/>
+              <rect x="252" y="172" width="96" height="170" rx="7" fill="#FFFFFF" stroke="#242321" stroke-width="4"/>
+              <!-- mini Sway pad on the screen -->
+              <rect x="256" y="176" width="44" height="162" fill="#D6E0F7"/>
+              <rect x="300" y="176" width="44" height="162" fill="#FBEFB4"/>
+              <line x1="300" y1="176" x2="300" y2="338" stroke="#242321" stroke-width="3"/>
+              <rect x="314" y="230" width="22" height="32" rx="5" fill="#E7473F" stroke="#242321" stroke-width="3"/>
+              <rect x="284" y="356" width="32" height="8" rx="4" fill="#242321"/>
+            </g>
+
+            <!-- Sound bars rising from B -->
+            <g stroke="#242321" stroke-width="4" fill="#E7473F" class="bars">
+              <rect x="440" y="300" width="16" height="40"/>
+              <rect x="464" y="276" width="16" height="64"/>
+              <rect x="488" y="292" width="16" height="48"/>
+              <rect x="512" y="262" width="16" height="78"/>
+            </g>
+          </svg>
+          <span class="hero-sfx">Swoosh!</span>
+          <span class="hero-bubble">Tilt to B&hellip;</span>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ─── How it works: three connected panels ───────────────────────────────────── -->
+    <section class="how" id="how" aria-labelledby="how-title">
+      <div class="section-head">
+        <h2 class="section-title" id="how-title">How it works</h2>
+        <p class="section-lede">Two devices. The laptop is the booth. The phone is the instrument.</p>
+      </div>
+
+      <ol class="strip">
+        <li class="panel panel--connect">
+          <span class="panel-num">01</span>
+          <h3 class="panel-title">Connect</h3>
+          <svg class="panel-art" viewBox="0 0 260 150" aria-hidden="true">
+            <!-- laptop -->
+            <rect x="18" y="30" width="120" height="78" rx="6" fill="#fff" stroke="#242321" stroke-width="5"/>
+            <rect x="6" y="108" width="144" height="14" rx="4" fill="#242321"/>
+            <!-- QR on laptop -->
+            <g fill="#242321">
+              <rect x="54" y="44" width="48" height="48" fill="#fff" stroke="#242321" stroke-width="3"/>
+              <rect x="59" y="49" width="12" height="12"/><rect x="85" y="49" width="12" height="12"/><rect x="59" y="75" width="12" height="12"/>
+              <rect x="77" y="67" width="6" height="6"/><rect x="87" y="77" width="8" height="8"/><rect x="75" y="81" width="6" height="6"/>
+            </g>
+            <!-- scan beam -->
+            <path d="M108 68 L190 46 L190 112 Z" fill="#F5D84E" stroke="#242321" stroke-width="3" stroke-linejoin="round" opacity=".9"/>
+            <!-- phone -->
+            <rect x="186" y="26" width="56" height="104" rx="10" fill="#E7473F" stroke="#242321" stroke-width="5"/>
+            <rect x="194" y="36" width="40" height="74" rx="4" fill="#fff" stroke="#242321" stroke-width="3"/>
+          </svg>
+          <p class="panel-text">Open the booth on your laptop and scan its QR code with your phone. Same Wi-Fi, no app to install.</p>
+        </li>
+
+        <li class="panel panel--move">
+          <span class="panel-num">02</span>
+          <h3 class="panel-title">Move</h3>
+          <svg class="panel-art" viewBox="0 0 260 150" aria-hidden="true">
+            <g fill="none" stroke="#242321" stroke-width="5" stroke-linecap="round">
+              <path d="M70 40 Q 40 75 70 112"/><path d="M190 40 Q 220 75 190 112"/>
+            </g>
+            <g fill="#242321"><polygon points="58,106 78,122 80,100"/><polygon points="202,106 182,122 180,100"/></g>
+            <g transform="rotate(-14 130 76)">
+              <rect x="104" y="20" width="56" height="108" rx="10" fill="#E7473F" stroke="#242321" stroke-width="5"/>
+              <rect x="112" y="30" width="40" height="78" rx="4" fill="#fff" stroke="#242321" stroke-width="3"/>
+            </g>
+            <text x="22" y="82" font-family="Bowlby One SC, Arial Black" font-size="26" fill="#2457D6" stroke="#242321" stroke-width="1.5">A</text>
+            <text x="220" y="82" font-family="Bowlby One SC, Arial Black" font-size="26" fill="#F5D84E" stroke="#242321" stroke-width="1.5">B</text>
+          </svg>
+          <p class="panel-text">Tilt left or right to slide between Deck A and Deck B. Tip it forward to lift the energy, or back to muffle it.</p>
+        </li>
+
+        <li class="panel panel--mix">
+          <span class="panel-num">03</span>
+          <h3 class="panel-title">Mix</h3>
+          <svg class="panel-art" viewBox="0 0 260 150" aria-hidden="true">
+            <!-- two waveforms meeting on a beat grid -->
+            <g stroke="#242321" stroke-width="2" opacity=".35">
+              <line x1="50" y1="18" x2="50" y2="132"/><line x1="100" y1="18" x2="100" y2="132"/><line x1="150" y1="18" x2="150" y2="132"/><line x1="200" y1="18" x2="200" y2="132"/>
+            </g>
+            <path d="M10 50 L30 50 L34 28 L40 70 L46 36 L52 62 L60 44 L80 50 L84 30 L90 70 L96 38 L100 50 L120 50 L126 44 L132 54 L140 50 L150 50" fill="none" stroke="#2457D6" stroke-width="5" stroke-linejoin="round"/>
+            <path d="M100 102 L120 102 L126 96 L132 106 L150 102 L154 80 L160 122 L166 86 L172 116 L180 100 L200 102 L204 82 L210 120 L216 88 L222 112 L250 102" fill="none" stroke="#242321" stroke-width="9" stroke-linejoin="round"/>
+            <path d="M100 102 L120 102 L126 96 L132 106 L150 102 L154 80 L160 122 L166 86 L172 116 L180 100 L200 102 L204 82 L210 120 L216 88 L222 112 L250 102" fill="none" stroke="#F5D84E" stroke-width="5" stroke-linejoin="round"/>
+            <polygon points="150,60 160,74 176,70 166,84 176,98 160,94 150,108 140,94 124,98 134,84 124,70 140,74" fill="#E7473F" stroke="#242321" stroke-width="4" stroke-linejoin="round"/>
+          </svg>
+          <p class="panel-text">In Auto DJ, Sway waits for the next phrase or downbeat and cuts the outgoing bass so the blend lands cleanly.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ─── Meet the booth ──────────────────────────────────────────────────────────────── -->
+    <section class="booth-sec" id="booth" aria-labelledby="booth-title">
+      <div class="booth-copy">
+        <h2 class="section-title" id="booth-title">Meet the booth</h2>
+        <p class="section-lede">Everything you need to read the mix from across the room. Nothing you don’t.</p>
+        <ul class="feature-list">
+          <li><b>Two decks.</b> Blue for A, yellow for B, each with its track name, time, BPM and waveform.</li>
+          <li><b>Your own files.</b> Load any MP3 from your laptop. Nothing gets uploaded to a cloud.</li>
+          <li><b>Hands-on when you want it.</b> Drag the crossfader, or use the arrow keys.</li>
+          <li><b>Auto DJ.</b> Call the transition with a tilt. Sway picks the moment.</li>
+          <li><b>Music-aware.</b> Each track is analyzed for downbeats and sections. If analysis isn’t available, Sway falls back to a clean equal-power crossfade.</li>
+        </ul>
+        <a class="btn btn--blue" href="/app">Open the booth</a>
+      </div>
+
+      <figure class="booth-shot">
+        <div class="shot-frame">
+          <div class="shot-bar" aria-hidden="true"><i></i><i></i><i></i><span>localhost:3443/app</span></div>
+          <img src="/assets/booth.png" width="1440" height="900" loading="lazy" decoding="async"
+               alt="Screenshot of the Sway booth: Deck A and Deck B with waveforms, a status panel in the middle, and a wide crossfader below." />
+        </div>
+        <figcaption class="shot-cap">Real screenshot: Auto DJ has been asked to swap to Deck B and is waiting for the next downbeat.</figcaption>
+        <div class="shot-phone">
+          <img src="/assets/controller.png" width="390" height="844" loading="lazy" decoding="async"
+               alt="Screenshot of the Sway phone controller: a large tilt pad split into A and B halves with a red phone-shaped puck." />
+        </div>
+      </figure>
+    </section>
+
+    <!-- ─── Manual vs Auto ──────────────────────────────────────────────────────────────── -->
+    <section class="modes" id="modes" aria-labelledby="modes-title">
+      <h2 class="section-title" id="modes-title">Two ways to play</h2>
+
+      <div class="versus">
+        <article class="mode-card mode-card--manual">
+          <h3 class="mode-name">Manual</h3>
+          <p class="mode-line">You control the mix directly.</p>
+          <div class="mode-demo" aria-hidden="true">
+            <div class="demo-track"><span class="demo-handle demo-handle--follow"></span></div>
+            <div class="demo-labels"><span>A</span><span>phone = fader</span><span>B</span></div>
+          </div>
+          <ul class="mode-points">
+            <li>The fader goes exactly where your phone points.</li>
+            <li>Tilt halfway for a blend, all the way for a full swap.</li>
+            <li>Energy nudge works in both modes.</li>
+          </ul>
+        </article>
+
+        <div class="vs" aria-hidden="true"><span>VS</span></div>
+
+        <article class="mode-card mode-card--auto">
+          <h3 class="mode-name">Auto DJ</h3>
+          <p class="mode-line">You ask for the transition. Sway picks the musical moment.</p>
+          <div class="mode-demo" aria-hidden="true">
+            <ol class="demo-steps">
+              <li>Tilt hard to B</li>
+              <li>Wait for phrase or downbeat</li>
+              <li>Match BPM, cut bass</li>
+              <li>Glide to B</li>
+            </ol>
+          </div>
+          <ul class="mode-points">
+            <li>Waits for a phrase boundary if one is less than 5 seconds away. Otherwise it goes on the next downbeat.</li>
+            <li>Temporarily matches the incoming track when the two tracks are within range.</li>
+            <li>Without analysis, it does a plain equal-power crossfade.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- ─── Closing CTA ──────────────────────────────────────────────────────────────────── -->
+    <section class="closer" aria-labelledby="closer-title">
+      <h2 class="closer-title" id="closer-title">Ready to make some noise?</h2>
+      <p class="closer-sub">Open the booth on this laptop, load two tracks, then scan the code with your phone.</p>
+      <a class="btn btn--lg btn--red" href="/app">Launch Sway</a>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <a class="wordmark foot-mark" href="/" aria-label="Sway home">SWAY!</a>
+    <p class="foot-text">A two-device DJ system. Laptop booth, phone instrument.</p>
+    <nav class="foot-links" aria-label="Footer">
+      <a href="/app">DJ booth</a>
+      <a href="/controller">Phone controller</a>
+      <a href="#how">How it works</a>
+    </nav>
+  </footer>
+
+</body>
+</html>
